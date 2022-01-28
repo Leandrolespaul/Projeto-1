@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estoque</title>
+</head>
+
+<body>
+    <script>
+        class ItemEstoque {
+            constructor(descricao, unidadeMedida, preco) {
+                this.descricao = descricao
+                this.unidadeMedida = unidadeMedida
+                this.preco = preco
+            }
+        }
+
+        class Deposito {
+
+            itens = []
+
+            constructor(nome, quantidadeMinima) {
+                this.nome = nome
+                this.quantidadeMinima = quantidadeMinima
+            }
+
+            adicionarItem(item, quantidade) {
+                if (quantidade < 0) throw Error('Quantidade não pode ser negativa')
+                const itemEstoque = this.itens.find(itemEst => itemEst.item === item)
+                if (itemEstoque) {
+                    itemEstoque.quantidade += quantidade
+
+                    return item
+                }
+                this.itens.push({
+                    item,
+                    quantidade
+                })
+
+                return item
+            }
+
+            removerItem(item, quantidade) {
+                if (quantidade < 0) throw Error('Quantidade Removida tem que ser maior que 0')
+                const itemEstoque = this.itens.find(itemEst => itemEst.item === item)
+                if (itemEstoque) {
+                    itemEstoque.quantidade -= quantidade
+                    return item
+                }
+
+            }
+
+            getValorTotal() {
+                return this.itens.reduce((ac, itemEst) => ac + (itemEst.quantidade * itemEst.item.preco), 0)
+
+            }
+
+            quantidadeTotalItem(item) {
+                const itemEstoque = this.itens.find(itemEst => itemEst.item === item)
+                if (itemEstoque) {
+                    return itemEstoque.quantidade
+                }
+                return 0
+            }
+
+            reposicaoItem(item) {
+                return this.itens.filter(item => {
+                    if (item.quantidade <= 10) return item.item
+                })
+            }
+        }
+
+
+        class Estoque {
+            depositos = []
+
+            constructor(nome, localizacao) {
+                this.nome = nome
+                this.localizacao = localizacao
+            }
+
+            criarDeposito(nome, quantidadeMinima) {
+                const novoDeposito = new Deposito(nome, quantidadeMinima)
+                this.depositos.push(novoDeposito)
+                return novoDeposito
+            }
+
+            removerDeposito(deposito) {
+                // const indice = this.depositos.indexOf(deposito)
+                // if (indice !== -1) // So remove o item se o deposito for encontrado
+                //     this.depositos.splice(indice, 1)
+                // return this.depositos
+
+                this.depositos = this.depositos.filter(depositoEst => depositoEst !== deposito)
+                return this.depositos
+            }
+
+            getValorTotal() {
+                return this.depositos.reduce((ac, depositoEst) => ac + depositoEst.getValorTotal(), 0)
+            }
+            quantidadeTotalDeposito(item) {
+              return  this.depositos.reduce((ac, depositoEst) => ac + depositoEst.quantidadeTotalItem(item), 0)
+            }
+            //  Estoque [deposito, deposito...] -> deposito -> itens
+            quantidadeTotalporDeposito(item){
+                return this.depositos.map(depositoEst =>{
+                    return {deposito: depositoEst.nome, item: item.descricao, unidadeMedida: item.unidadeMedida, quantidade: depositoEst.quantidadeTotalItem(item) }
+                })
+            }
+        }
+   
+    </script>
+
+</body>
+
+</html>
